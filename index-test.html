@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Three.js Shader</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene setup
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        const target = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Geometry and material
+        const geometry = new THREE.PlaneGeometry(1, 1); // A square plane
+        const material = new THREE.ShaderMaterial({
+            vertexShader: `
+                void main() {
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    gl_Position = vec4(position, 1.0);
+
+                }
+            `,
+            fragmentShader: `
+                precision mediump float;
+
+                void main() {
+                    float radiansValue = radians(50.0); 
+                    gl_FragColor = vec4(radiansValue / 3.141592653589793, 0.0, 0.0, 1.0);
+               
+                    //gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // Red color
+                }
+            `
+        });
+
+        // Create a mesh and add to the scene
+        const square = new THREE.Mesh(geometry, material);
+        scene.add(square);
+
+        // Camera position
+        camera.position.z = 2;
+        // Create a WebGLRenderTarget to render the scene to
+
+        // Function to read pixel color from the framebuffer
+        function readPixelColor() {
+            // return;
+            const pixel = new Uint8Array(100);  // Array to store the color (RGBA)
+            // Read the pixel color at (0, 0) or any pixel you want to inspect
+            renderer.readRenderTargetPixels(renderer.getRenderTarget(), 0, 0, 1, 1, pixel);
+            // The red channel will be in pixel[0] (range 0-255)
+            const redComponent = pixel[Math.round(pixel.length / 2)] / 255.0; // Normalize the red component to [0, 1]
+
+            console.log(`RedComponent=${redComponent}  ${pixel.length}- Expected radians(50) / π  =${Math.sin(50 * Math.PI / 180) / Math.PI}`);
+        }
+
+
+
+
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+
+            renderer.setRenderTarget(target);
+            renderer.render(scene, camera);
+
+            // Now, read the pixel color after rendering the scene
+            readPixelColor();
+
+            // Reset the render target to the default framebuffer (so we can render to the screen)
+            renderer.setRenderTarget(null);
+            renderer.render(scene, camera);
+
+            // Reset the render target to the default framebuffer (so we can render to the screen)
+
+
+        }
+
+        animate();
+    </script>
+</body>
+
+</html>

@@ -29,8 +29,7 @@ const sizes = {
     pixelRatio: Math.min(window.devicePixelRatio, 2)
 }
 
-window.addEventListener('resize', () =>
-{
+window.addEventListener('resize', () => {
     // Update sizes
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
@@ -71,7 +70,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(sizes.pixelRatio)
 
-/**
+/** 
  * Material
  */
 const materialParameters = {}
@@ -88,8 +87,7 @@ const material = new THREE.ShaderMaterial({
 
 gui
     .addColor(materialParameters, 'color')
-    .onChange(() =>
-    {
+    .onChange(() => {
         material.uniforms.uColor.value.set(materialParameters.color)
     })
 
@@ -116,12 +114,10 @@ scene.add(sphere)
 let suzanne = null
 gltfLoader.load(
     './suzanne.glb',
-    (gltf) =>
-    {
+    (gltf) => {
         suzanne = gltf.scene
-        suzanne.traverse((child) =>
-        {
-            if(child.isMesh)
+        suzanne.traverse((child) => {
+            if (child.isMesh)
                 child.material = material
         })
         scene.add(suzanne)
@@ -129,17 +125,26 @@ gltfLoader.load(
 )
 
 /**
+ * Light Helpers
+ */
+const directionalLightHelper = new THREE.Mesh(
+    new THREE.PlaneGeometry(),
+    new THREE.MeshBasicMaterial()
+)
+directionalLightHelper.material.color.setRGB(0.1, 0.1, 1);
+directionalLightHelper.material.side = THREE.DoubleSide;
+directionalLightHelper.position.set(0, 0, 3);
+scene.add(directionalLightHelper);
+/**
  * Animate
  */
 const clock = new THREE.Clock()
 
-const tick = () =>
-{
+const tick = () => {
     const elapsedTime = clock.getElapsedTime()
 
     // Rotate objects
-    if(suzanne)
-    {
+    if (suzanne) {
         suzanne.rotation.x = - elapsedTime * 0.1
         suzanne.rotation.y = elapsedTime * 0.2
     }
