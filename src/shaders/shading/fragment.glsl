@@ -24,6 +24,17 @@ void main() {
         0.25 // Light decay
     );
 
+    light += pointLight(
+        vec3(.0,1.0,0.5), // light color
+        1.0, // light intensity
+        normal, // normal
+        vec3(2.0,2.,2.), // Light Position
+        viewDirection,
+        20.0, // Specular power
+        vPosition, // Fragment Position,
+        0.2 // Light decay
+    );
+
     light += directionalLight(
         vec3(.1, 0.1, 1.),
         1., 
